@@ -9,60 +9,50 @@ from django.core.files import File
 from django.http import HttpResponseRedirect, HttpResponse
 import time
 from PyPDF2 import PdfFileReader
+from const.Title import Title
+from const.Content import Content
 from django.core.mail import send_mail
 # Create your views here.
 
 #naslovi i sadržaji svih obavijesti
-SUBMISSION_TITLE = 'PREDAN {} RAD, ULOGA: {}'
-SUBMISSION_CONTENT = 'Korisnik/ca <a href="/profil/{}/">{}</a> predao/la vam je rad kojemu \
-možete pristupiti na sljedećoj poveznici <a href="/prikaz/{}/">{}</a> <br> <br> '
+SUBMISSION_TITLE = Title.SUBMISSION
+SUBMISSION_CONTENT = Content.SUBMISSION
 
-STUDENT_TO_MENTOR_SUBMISSION_TITLE = 'PREDALI STE {} RAD MENTORU'
-STUDENT_TO_MENTOR_SUBMISSION_CONTENT = 'Uspješno ste predali svoj rad mentoru. Status rada možete pratiti ovdje \
- <a href="/prikaz/{}/">{}</a>'
+STUDENT_TO_MENTOR_SUBMISSION_TITLE = Title.STUDENT_TO_MENTOR_SUBMISSION
+STUDENT_TO_MENTOR_SUBMISSION_CONTENT = Content.STUDENT_TO_MENTOR_SUBMISSION
 
-STUDENT_TO_PRESIDENT_SUBMISSION_TITLE = 'PREDALI STE {} RAD PREDSJEDNIKU POVJERENSTVA'
-STUDENT_TO_PRESIDENT_SUBMISSION_CONTENT = 'Uspješno ste predali svoj rad predjedniku povjerenstva. Status rada možete pratiti ovdje \
- <a href="/prikaz/{}/">{}</a>'
+STUDENT_TO_PRESIDENT_SUBMISSION_TITLE = Title.STUDENT_TO_PRESIDENT_SUBMISSION
+STUDENT_TO_PRESIDENT_SUBMISSION_CONTENT = Content.STUDENT_TO_PRESIDENT_SUBMISSION
 
-VERIFICATION_TITLE = 'IZVRŠENA PROVJERA IZVORNOSTI'
-MENTOR_VERIFICATION_CONTENT = 'Uspješno ste izvršili provjeru izvornosti za rad: <a href="/prikaz/{}/">{}</a>. \
-Generirani obrazac o provjeri izvornosti možete preuzeti <a href="/media/{}">ovdje</a>'
-STUDENT_VERIFICATION_CONTENT = 'Mentor/ica je izvršio/la provjeru izvornosti za vaš rad: <a href="/prikaz/{}/">{}</a>. \
-Generirani obrazac o provjeri izvornosti možete preuzeti <a href="/media/{}">ovdje</a>'
+VERIFICATION_TITLE = Title.VERIFICATION
+MENTOR_VERIFICATION_CONTENT = Content.MENTOR_VERIFICATION
+STUDENT_VERIFICATION_CONTENT = Content.STUDENT_VERIFICATION
 
-STATUS_CHANGE_TITLE = 'PROMJENA STATUSA RADA'
-STATUS_CHANGER_CONTENT = 'Uspješno ste promijenili status rada u <b>{}</b> za rad: <a href="/prikaz/{}/">{}</a>.'
-STATUS_CHANGED_CONTENT = 'Status vašeg rada: <a href="/prikaz/{}/">{}</a> promijenjen je u <b>{}</b>. <br> <br>'
+STATUS_CHANGE_TITLE = Title.STATUS_CHANGE
+STATUS_CHANGER_CONTENT = Content.STATUS_CHANGER
+STATUS_CHANGED_CONTENT = Content.STATUS_CHANGED
 
-BACHELOR_GRADE_TITLE = 'UNESENA KONAČNA OCJENA ZAVRŠNOG RADA'
-MENTOR_GRADE_CONTENT = 'Uspješno ste unijeli konačnu ocjenu za rad: <a href="/prikaz/{}/">{}</a> \
-<br> <br> Ocjena: <b>{}</b> <br> Status rada: <b>{}</b>'
-STUDENT_BACHELOR_GRADE_CONTENT = 'Mentor/ica je unio/jela konačnu ocjenu za vaš rad: <a href="/prikaz/{}/">{}</a> \
-<br> <br>Konačna ocjena: <b>{}</b> <br> Status rada: <b>{}</b>'
+BACHELOR_GRADE_TITLE = Title.BACHELOR_GRADE
+MENTOR_GRADE_CONTENT = Content.MENTOR_GRADE
+STUDENT_BACHELOR_GRADE_CONTENT = Content.STUDENT_BACHELOR_GRADE
 
-ADDED_TO_COMITEE_TITLE = 'DODANI STE KAO ČLAN POVJERENSTVA DIPLOMSKOG RADA'
-ADDED_TO_COMITEE_CONTENT = 'Dodani ste kao član povjerenstva za diplomski rad: <a href="/prikaz/{}/">{}</a>. <br> \
-Nakon obrane rada na ovoj <a class="modal-trigger" data-target="grade" href="#grade" data-tg_id="{}" >poveznici</a> možete \
-unesti ocjenu rada i obrane.'
+ADDED_TO_COMITEE_TITLE = Title.ADDED_TO_COMITEE
+ADDED_TO_COMITEE_CONTENT = Content.ADDED_TO_COMITEE
 
-ADDED_COMITEE_TITLE = 'DODANI ČLANOVI POVJERENSTVA ZA DIPLOMSKI RAD'
-ADDED_COMITEE_CONTENT = 'Uspješno ste dodali članove povjerenstva za diplomski rad: <a href="/prikaz/{}/">{}</a>'
-STUDENT_ADDED_COMITEE_TITLE = 'DODANI ČLANOVI POVJERENSTVA ZA DIPLOMSKI RAD'
-STUDENT_ADDED_COMITEE_CONTENT = 'Dodani su članovi povjerenstva za vaš diplomski rad: <a href="/prikaz/{}/">{}</a> <br> <br> \
-Članovi: <br>'
+ADDED_COMITEE_TITLE = Title.ADDED_COMITEE
+ADDED_COMITEE_CONTENT = Content.ADDED_COMITEE
+STUDENT_ADDED_COMITEE_TITLE = Title.STUDENT_ADDED_COMITEE
+STUDENT_ADDED_COMITEE_CONTENT = Content.STUDENT_ADDED_COMITEE
 
-COMITEE_MEMBER_ADDED_GRADE_TITLE = 'UNESENE OCJENA RADA I OCJENA OBRANE'
-COMITEE_MEMBER_ADDED_GRADE_CONTENT = 'Uspješno ste unijeli ocjenu rada i ocjenu obrane za rad: <a href="/prikaz/{}/">{}</a><br> <br> \
-Ocjena rada: <b>{}</b> <br> Ocjena obrane: <b>{}</b>'
+COMITEE_MEMBER_ADDED_GRADE_TITLE = Title.COMITEE_MEMBER_ADDED_GRADE
+COMITEE_MEMBER_ADDED_GRADE_CONTENT = Content.COMITEE_MEMBER_ADDED_GRADE
 
-MASTER_GRADE_TITLE = 'UNESENA KONAČNA OCJENA DIPLOMSKOG RADA'
-STUDENT_MASTER_GRADE_CONTENT = 'Članovi povjerenstva unijeli su ocjene za vaš rad :<a href="/prikaz/{}/">{}</a> \
-<br> <br>Konačna ocjena: <b>{}</b> <br> Status rada: <b>{}</b> <br> <br> Ocjene članova: <br>'
+MASTER_GRADE_TITLE = Title.MASTER_GRADE
+STUDENT_MASTER_GRADE_CONTENT = Content.STUDENT_MASTER_GRADE
 
-CHANGED_DOCUMENT_TITLE = 'PROMJENA DOKUMENTA RADA'
-STUDENT_CHANGED_DOCUMENT_CONTENT = 'Uspješno ste promijenili datoteku rada za <a href="/prikaz/{}/">{}</a>'
-PRESIDENT_CHANGED_DOCUMENT_CONTENT = 'Izvršena je promjena datoteke za rad <a href="/prikaz/{}/">{}</a> u ispravljenu verziju'
+CHANGED_DOCUMENT_TITLE = Title.CHANGED_DOCUMENT
+STUDENT_CHANGED_DOCUMENT_CONTENT = Content.STUDENT_CHANGED_DOCUMENT
+PRESIDENT_CHANGED_DOCUMENT_CONTENT = Content.PRESIDENT_CHANGED_DOCUMENT
 
 def login(request):
 	"""
